@@ -1,12 +1,13 @@
 package com.godcoder.myhome.controller;
 
 import com.godcoder.myhome.model.Board;
+import com.godcoder.myhome.model.Type;
 import com.godcoder.myhome.repository.BoardRepository;
+import com.godcoder.myhome.repository.TypeRepository;
 import com.godcoder.myhome.service.BoardService;
 import com.godcoder.myhome.validator.BoardValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.Authentication;
@@ -16,6 +17,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Controller
 @RequestMapping("/board")
@@ -25,26 +30,44 @@ public class BoardController {
     private BoardRepository boardRepository;
 
     @Autowired
+    private TypeRepository typeRepository;
+
+    @Autowired
     private BoardService boardService;
 
     @Autowired
     private BoardValidator boardValidator;
 
+    private final Logger log = LoggerFactory.getLogger(getClass());
+
     @GetMapping("/list")
     public String list(Model model, @PageableDefault(size = 2) Pageable pageable,
-                       @RequestParam(required = false, defaultValue = "") String searchText) {
+                       @RequestParam(required = false, defaultValue = "") String searchText
+//                       @RequestParam(required = false) Long types
+    ) {
 //        Page<Board> boards = boardRepository.findAll(pageable);
+        Long boardtype = null;
+//        if(types == null){
+//            boardtype = 4L;
+//        }else {
+//            boardtype = Long.parseLong(String.valueOf(types));
+//        }
+
         Page<Board> boards = boardRepository.findByTitleContainingOrContentContaining(searchText, searchText ,pageable);
+//        Page<Board> boards = boardRepository.findByTitleContainingOrContentContainingOrBoardTypeContaining(searchText, searchText ,pageable, boardtype);
         int startPage = Math.max(1, boards.getPageable().getPageNumber() - 4);
         int endPage = Math.min(boards.getTotalPages(),boards.getPageable().getPageNumber() + 4);
+        List<Type> types = typeRepository.findAll();
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
         model.addAttribute("boards", boards);
+        model.addAttribute("types", types);
         return  "board/list";
     }
 
     @GetMapping("/form")
-    public String form(Model model, @RequestParam(required = false) Long id) {
+    public String form(Model model, @RequestParam(required = false) Long id,
+                       @RequestParam(required = false) Long types) {
         if(id == null){
             model.addAttribute("board", new Board());
         }else {

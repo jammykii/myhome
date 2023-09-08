@@ -28,6 +28,9 @@
               <li class="nav-item" th:classappend="${menu} == 'board'? 'active'">
                   <a class="nav-link" th:href="@{/board/list}">게시판 <span class="sr-only" th:if="${menu} == 'board'">(current)</span></a>
               </li>
+              <li class="nav-item" th:classappend="${menu} == 'role'? 'active'" sec:authorize="hasRole('ROLE_ADMIN')">
+              <a class="nav-link" type="button" th:href="@{/user/userRole}"><span class="sr-only" th:if="${menu} == 'role'"></span>권한설정</span></a>
+              </li>
           </ul>
 
           <a class="btn btn-secondary my-2 mr-2 my-sm-0" th:href="@{/account/login}"

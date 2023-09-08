@@ -1,6 +1,7 @@
 package com.godcoder.myhome.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.godcoder.myhome.model.Board;
 import com.godcoder.myhome.repository.BoardRepository;
@@ -41,6 +42,11 @@ class BoardApiController {
 
         return repository.findById(id).orElse(null);
     }
+//    @GetMapping("/boards/{type}")
+//    Board Types(@PathVariable int type) {
+//
+//        return (Board) repository.findByBoardType(type);
+//    }
 
     @PutMapping("/boards/{id}")
     Board replaceBoard(@RequestBody Board newBoard, @PathVariable Long id) {

@@ -41,20 +41,24 @@
             </div>
               <button type="submit" class="btn btn-light mb-3">검색</button>
           </form>
+          <!-- <select th:onchange="searchType()" class="w-20 h-auto">
+            <option value="0" selected>전체</option>
+            <option th:each="type : ${types}" th:value="${type.type_id}" th:text="${type.type_name}">One</option>
+        </select> -->
         <table class="table table-striped table-hover">
             <thead>
               <tr>
-                <th scope="col">번호</th>
-                <th scope="col">분류</th>
+                <th scope="col">번호</th>  
                 <th scope="col">제목</th>
+                <th scope="col">분류</th>
                 <th scope="col">작성자</th>
               </tr>
             </thead>
             <tbody>
               <tr th:each="board : ${boards}">
                 <td th:text="${board.id}">Mark</td>
-                <td th:text="${board.boardType.type_name}">Mark</td>
                 <td><a th:text="${board.title}" th:href="@{/board/form(id=${board.id})}">Otto</a></td>
+                <td th:text="${board.boardType.type_name}">Mark</td>
                 <td th:text="${board.user.username}">김준철</td>
               </tr>
             </tbody>
@@ -78,6 +82,13 @@
     </div>
 
     <footer th:replace="fragments/common :: footer"></footer>
+    <script>
+        function searchType(){
+            $.ajax({
+                url: "/board/list?page=0"
+            })
+        }
+    </script>
 </body>
 
 </html>

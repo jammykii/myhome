@@ -22,7 +22,7 @@ public class Board {
 
     @OneToOne
     @JoinColumn(name = "board_type")
-    private BoardType boardType;
+        private Type boardType;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
