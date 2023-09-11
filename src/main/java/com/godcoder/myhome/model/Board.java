@@ -19,10 +19,12 @@ public class Board {
     private String title;
     private String content;
 
+    private long board_type;
+
 
     @OneToOne
-    @JoinColumn(name = "board_type")
-        private Type boardType;
+    @JoinColumn(name = "board_type", insertable = false, updatable = false)
+    private Type boardType;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

@@ -28,25 +28,17 @@ class BoardApiController {
             return repository.findByTitleOrContent(title,content);
         }
     }
-    // end::get-aggregate-root[]
 
     @PostMapping("/boards")
     Board newBoard(@RequestBody Board newBoard) {
         return repository.save(newBoard);
     }
 
-    // Single item
-
     @GetMapping("/boards/{id}")
     Board one(@PathVariable Long id) {
 
         return repository.findById(id).orElse(null);
     }
-//    @GetMapping("/boards/{type}")
-//    Board Types(@PathVariable int type) {
-//
-//        return (Board) repository.findByBoardType(type);
-//    }
 
     @PutMapping("/boards/{id}")
     Board replaceBoard(@RequestBody Board newBoard, @PathVariable Long id) {

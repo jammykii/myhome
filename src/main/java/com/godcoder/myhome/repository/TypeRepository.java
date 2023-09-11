@@ -9,4 +9,6 @@ public interface TypeRepository extends JpaRepository<Type, Long> {
 
     @Override
     List<Type> findAll();
+
+    Type findByTypeName(String typeName);
 }

@@ -27,9 +27,14 @@
                     제목 에러 메세지
                 </div>
             </div>
-            <!-- <select class="form-select" aria-label="Default select example">
-                <option th:value="${board.board_type.type_id}" th:text="${board.board_type.type_name}">One</option>
-                </select> -->
+            <div class="mb-3">
+            <select id="board_type" th:field="*{board_type}">
+                <option th:each="type : ${types}" th:value="${type.typeId}" th:text="${type.typeName}">One</option>
+            </select>
+        </div>
+            <div class="mb-3">
+                <input type="file">
+            </div>
             <div class="mb-3">
                 <label for="content" class="form-label">내용</label>
                 <textarea class="form-control" id="content" rows="3" 

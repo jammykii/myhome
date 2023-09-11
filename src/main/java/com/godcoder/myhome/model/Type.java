@@ -10,9 +10,11 @@ public class Type {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long type_id;
+    @Column(name = "type_id")
+    private long typeId;
 
-    private String type_name;
+    @Column(name = "type_name")
+    private String typeName;
 
 
 }

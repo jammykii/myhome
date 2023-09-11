@@ -43,6 +43,7 @@ public class UserService {
         Board board = new Board();
         board.setTitle("안녕하세요!");
         board.setContent("반갑습니다.");
+        board.setBoard_type(4);
         board.setUser(savedUser);
         boardRepository.save(board);
 
