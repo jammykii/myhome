@@ -26,7 +26,8 @@ public class AccountController {
     }
 
     @PostMapping("/register")
-    public String register(User user) {
+    public String register(User user) { 
+//        int role_id = 0;
         userService.save(user);
         return "redirect:/";
     }

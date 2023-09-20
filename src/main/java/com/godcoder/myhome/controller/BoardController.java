@@ -59,7 +59,7 @@ public class BoardController {
             boards = boardRepository.findByBoardTypeOrUser(type,user,pageable);
 
         }
-
+    
         int startPage = Math.max(1, boards.getPageable().getPageNumber() - 4);
         int endPage = Math.min(boards.getTotalPages(),boards.getPageable().getPageNumber() + 4);
         List<Type> types = typeRepository.findAll();
@@ -95,7 +95,6 @@ public class BoardController {
         }
         String username = authentication.getName();
         long board_types = board.getBoard_type();
-        System.out.println(board_types);
         boardService.save(username, board, board_types);
         return "redirect:/board/list";
     }

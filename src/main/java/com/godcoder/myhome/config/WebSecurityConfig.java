@@ -29,9 +29,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // csrf: 사이트 간 요청 위조 (Cross-site request forgery)
                 // csrf().disable() - 테스트 할 때는 간편하게 할 수 있지만
                 // 나중에 업무에서 diable을 하게된다면 심각한 보안 문제를 일으킬 수 있음
-             .csrf().disable()
+            .csrf().disable()
             .authorizeRequests()
                 .antMatchers("/","/account/register" ,"/css/**", "/api/**").permitAll()
+                .antMatchers("/user/**").access("hasRole('ROLE_ADMIN') or hasAuthority('TOTAL_ADMIN')")
                 .anyRequest().authenticated()
                 .and()
             .formLogin()

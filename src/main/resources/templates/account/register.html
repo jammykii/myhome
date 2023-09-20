@@ -6,19 +6,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
         integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-    <link href="starter-template.css" rel="stylesheet">
     <link th:href="@{/css/signin.css}" rel="stylesheet">
     <title>Login</title>
 </head>
+<script>
+  function pwCheck(){
+      if(form.password.value != form.passwordCheck.value){
+        alert('비밀번호가 서로 다릅니다.')
+        return false
+      }
 
+      return true
+  }
+</script>
 <body class="text-center">
-    <form class="form-signin" th:action="@{/account/register}" method="post">
+    <form class="form-signin" name="form" th:action="@{/account/register}" method="post" onsubmit="return pwCheck()">
         <a th:href="@{/}"><img class="mb-4" src="https://getbootstrap.com/docs/4.5/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72"></a>
         <h1 class="h3 mb-3 font-weight-normal">회원가입</h1>
         <label for="username" class="sr-only">Username</label>
         <input type="text" id="username" name="username" class="form-control" placeholder="Username" required autofocus>
         <label for="inputPassword" class="sr-only">Password</label>
         <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password" required>
+        <label for="inputPassword" class="sr-only">PasswordCheck</label>
+        <input type="password" id="inputPassword" name="passwordCheck" class="form-control" placeholder="Password" required>
         <!-- <div class="checkbox mb-3">
           <label>
             <input type="checkbox" value="remember-me"> Remember me

@@ -11,6 +11,12 @@
      <link th:href="@{/css/starter-template.css}" rel="stylesheet">
 
     <title th:text="${title}">Hello, Spring Boot!</title>
+    <header th:fragment="openlayer">
+      <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+      <script src="https://cdn.jsdelivr.net/npm/ol@v8.1.0/dist/ol.js"></script>
+      <script src="	https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.6.2/proj4-src.js"></script>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v8.1.0/ol.css"/>
+    </header>
 </head>
   <body>
     <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top" th:fragment= "menu(menu)">
@@ -19,7 +25,6 @@
           aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
       </button>
-  
       <div class="collapse navbar-collapse" id="navbarsExampleDefault">
           <ul class="navbar-nav mr-auto">
               <li class="nav-item" th:classappend="${menu} == 'home'? 'active'">
@@ -31,7 +36,10 @@
               <li class="nav-item" th:classappend="${menu} == 'role'? 'active'" sec:authorize="hasRole('ROLE_ADMIN')">
               <a class="nav-link" type="button" th:href="@{/user/usrole}"><span class="sr-only" th:if="${menu} == 'role'"></span>권한설정</span></a>
               </li>
-          </ul>
+              <li class="nav-item" th:classappend="${menu} == 'map'? 'active'">
+              <a class="nav-link" type="button" th:href="@{/map/maps}"><span class="sr-only" th:if="${menu} == 'map'"></span>지도</span></a>
+              </li>
+            </ul>
 
         <a class="btn btn-secondary my-2 mr-2 my-sm-0" th:href="@{/account/login}"
           sec:authorize="!isAuthenticated()">로그인</a>

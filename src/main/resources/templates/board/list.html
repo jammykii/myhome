@@ -31,7 +31,7 @@
     </div> -->
 </nav>
 
-    <div class="container">
+  <div class="container">
         <h1>게시판</h1>
         <div>총 건수 : <span th:text="${boards.totalElements}"></span></div>
         <form class="form-inline d-flex justify-content-end" method="GET" th:action="@{/board/list}">
@@ -82,13 +82,7 @@
     </div>
 
     <footer th:replace="fragments/common :: footer"></footer>
-    <script>
-        function searchType(){
-            $.ajax({
-                url: "/board/list?page=0"
-            })
-        }
-    </script>
+
 </body>
 
 </html>

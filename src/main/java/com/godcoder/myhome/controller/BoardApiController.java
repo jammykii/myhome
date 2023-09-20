@@ -3,6 +3,7 @@ package com.godcoder.myhome.controller;
 import java.util.List;
 import java.util.Optional;
 
+import com.godcoder.myhome.dto.BoardCountRankDTO;
 import com.godcoder.myhome.model.Board;
 import com.godcoder.myhome.repository.BoardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,10 @@ class BoardApiController {
     Board one(@PathVariable Long id) {
 
         return repository.findById(id).orElse(null);
+    }
+    @GetMapping("/boardsRank")
+    List<BoardCountRankDTO> one() {
+        return repository.BoardRank();
     }
 
     @PutMapping("/boards/{id}")
