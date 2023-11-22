@@ -14,13 +14,14 @@ public class Board {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     @NotNull
     @Size(min = 2, max = 30, message = "제목은 2자이상 30자 이하입니다.")
     private String title;
+
     private String content;
 
     private long board_type;
-
 
     @OneToOne
     @JoinColumn(name = "board_type", insertable = false, updatable = false)
@@ -29,5 +30,10 @@ public class Board {
     @ManyToOne
     @JoinColumn(name = "user_id")
     @JsonIgnore
-    private User user;
+    private Account account;
+
+    @Column(name = "view_cnt")
+    private long viewCount;
+
+
 }

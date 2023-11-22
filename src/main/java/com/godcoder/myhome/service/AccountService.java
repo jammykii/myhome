@@ -1,23 +1,21 @@
 package com.godcoder.myhome.service;
 
+import com.godcoder.myhome.model.Account;
 import com.godcoder.myhome.model.Board;
 import com.godcoder.myhome.model.Role;
-import com.godcoder.myhome.model.User;
 import com.godcoder.myhome.repository.BoardRepository;
-import com.godcoder.myhome.repository.UserRepository;
+import com.godcoder.myhome.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ListIterator;
-
 @Service
-public class UserService {
+public class AccountService {
 
     @Autowired
-    private UserRepository userRepository;
+    private AccountRepository accountRepository;
 
     @Autowired
     private BoardRepository boardRepository;
@@ -26,26 +24,31 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = { Exception.class })
-    public User save(User user) {
-        String encodedpassword = encodedpassword = passwordEncoder.encode(user.getPassword());
+    public Account save(Account account) {
+        String encodedpassword = encodedpassword = passwordEncoder.encode(account.getPassword());
 
-        user.setPassword(encodedpassword);
-        user.setEnabled(true);
+        account.setPassword(encodedpassword);
+        account.setEnabled(true);
 
         Role role = new Role();
 
         role.setId(1);
-        user.getRoles().add(role);
 
-        User savedUser = userRepository.save(user);
+        account.getRoles().add(role);
+
+        Account savedAccount = accountRepository.save(account);
 
         Board board = new Board();
         board.setTitle("안녕하세요!");
         board.setContent("반갑습니다.");
         board.setBoard_type(4);
-        board.setUser(savedUser);
+        board.setAccount(savedAccount);
         boardRepository.save(board);
 
-        return savedUser;
+        return savedAccount;
+    }
+
+    public boolean checkUserNameDuplicate(String name){
+        return accountRepository.existsByUsername(name);
     }
 }

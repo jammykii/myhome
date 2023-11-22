@@ -1,7 +1,7 @@
 package com.godcoder.myhome.repository;
 
+import com.godcoder.myhome.model.Account;
 import com.godcoder.myhome.model.QUser;
-import com.godcoder.myhome.model.User;
 import com.querydsl.jpa.impl.JPAQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -19,22 +19,23 @@ public class CustomizedUserRepositoryImpl implements CustomizedUserRepository {
     JdbcTemplate jdbcTemplate;
 
     @Override
-    public List<User> findByUsernameCustom(String username) {
+    public List<Account> findByUsernameCustom(String username) {
+
         QUser qUser = QUser.user;
         JPAQuery<?> query = new JPAQuery<Void>(em);
-        List<User> users = query.select(qUser)
+        List<Account> accounts = query.select(qUser)
                 .from(qUser)
                 .where(qUser.username.contains(username))
                 .fetch();
-        return users;
+        return accounts;
     }
 
     @Override
-    public List<User> findByUsernameJdbc(String username) {
-        List<User> users = jdbcTemplate.query(
-                "SELECT * FROM USER WHERE username like ?",
+    public List<Account> findByUsernameJdbc(String username) {
+        List<Account> accounts = jdbcTemplate.query(
+                "SELECT * FROM account WHERE username like ?",
                 new Object[]{"%" + username + "%"},
-                new BeanPropertyRowMapper(User.class));
-        return users;
+                new BeanPropertyRowMapper(Account.class));
+        return accounts;
     }
 }

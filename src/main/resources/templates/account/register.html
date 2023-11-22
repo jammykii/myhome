@@ -10,12 +10,21 @@
     <title>Login</title>
 </head>
 <script>
+  let i = 1;
   function pwCheck(){
       if(form.password.value != form.passwordCheck.value){
         alert('비밀번호가 서로 다릅니다.')
         return false
       }
-
+      if(i == 0){
+        alert('유저이름을 변경해주세요.')
+        i = 1
+        return false
+      }
+      if(i == 1){
+        alert('중복체크를 진행해주세요.')
+        return false
+      }
       return true
   }
 </script>
@@ -24,7 +33,8 @@
         <a th:href="@{/}"><img class="mb-4" src="https://getbootstrap.com/docs/4.5/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72"></a>
         <h1 class="h3 mb-3 font-weight-normal">회원가입</h1>
         <label for="username" class="sr-only">Username</label>
-        <input type="text" id="username" name="username" class="form-control" placeholder="Username" required autofocus>
+        <input type="text" id="username" name="username" class="form-control" placeholder="Username" required autofocus> 
+        <button style="margin: 10px 0;" class="btn btn-lg btn-primary btn-block" type="button" onclick="usnmCheck()">중복체크</button>
         <label for="inputPassword" class="sr-only">Password</label>
         <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password" required>
         <label for="inputPassword" class="sr-only">PasswordCheck</label>
@@ -35,10 +45,31 @@
           </label>
         </div> -->
         <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+        <a th:href="@{/}" class="badge badge-light">홈으로</a>
         <p class="mt-5 mb-3 text-muted">&copy; 2017-2020</p>
     </form>
 
     <footer th:replace="fragments/common :: footer"></footer>
+    <script>
+      function usnmCheck() {
+        let usnm = form.username.value
+        console.log(usnm)
+          $.ajax({
+              url: `/api/username/${usnm}/exists`,
+              type: 'GET',
+              success: function(result) {
+                console.log(result)
+                  if(!result){
+                    alert('사용가능한 유저이름입니다.')
+                    i = 2;
+                  }else{
+                    alert('중복된 유저이름입니다.')
+                    i = 0;
+                  }
+              }
+          });
+      }
+  </script>
 </body>
 
 </html>

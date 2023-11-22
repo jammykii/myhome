@@ -5,3 +5,26 @@ body {
     padding: 3rem 1.5rem;
     text-align: center;
 }
+.heart{
+  width: 50px;
+  height: 50px;
+}
+.tableWrap {
+  max-height: 500px;
+  overflow-y: scroll;
+  margin: 40px 0;
+}
+
+.tableWrap::-webkit-scrollbar {
+  width: 8px;  
+}
+
+.tableWrap::-webkit-scrollbar-thumb {
+  height: 30%; 
+  background: #919191; 
+  border-radius: 10px;
+}
+
+.tableWrap::-webkit-scrollbar-track {
+  background: rgba(33, 122, 244, .1); 
+}

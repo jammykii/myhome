@@ -18,9 +18,4 @@ public class UserRole {
     @Column(name = "role_id")
     private long roleId;
 
-//    @ManyToOne
-//    @JoinColumn(name = "user_id", insertable = false, updatable = false)
-//    private User user;
-
-
 }

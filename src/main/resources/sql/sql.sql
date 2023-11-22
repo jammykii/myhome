@@ -15,3 +15,5 @@ SELECT ur.user_id, u.username, ur.role_id, r.name FROM user_role ur, `user` u, `
 SELECT ROW_NUMBER() over (ORDER BY COUNT(b.id) desc) AS Rank, u.id AS id, u.username AS username, COUNT(b.id) AS count FROM board b, `user` u WHERE b.user_id = u.id GROUP BY u.id, u.username ORDER BY 1 asc
 
 
+DELETE FROM user_role WHERE user_id = 20
+

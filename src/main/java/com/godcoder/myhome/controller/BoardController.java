@@ -1,11 +1,11 @@
 package com.godcoder.myhome.controller;
 
+import com.godcoder.myhome.model.Account;
 import com.godcoder.myhome.model.Board;
 import com.godcoder.myhome.model.Type;
-import com.godcoder.myhome.model.User;
 import com.godcoder.myhome.repository.BoardRepository;
 import com.godcoder.myhome.repository.TypeRepository;
-import com.godcoder.myhome.repository.UserRepository;
+import com.godcoder.myhome.repository.AccountRepository;
 import com.godcoder.myhome.service.BoardService;
 import com.godcoder.myhome.validator.BoardValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ public class BoardController {
     private BoardRepository boardRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private AccountRepository accountRepository;
 
     @Autowired
     private TypeRepository typeRepository;
@@ -47,19 +47,19 @@ public class BoardController {
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     @GetMapping("/list")
-    public String list(Model model, @PageableDefault(size = 2) Pageable pageable,
-                       @RequestParam(required = false, defaultValue = "") String searchText
-    ) {
+    public String list(Model model, @PageableDefault(size = 5) Pageable pageable,
+                       @RequestParam(required = false, defaultValue = "") String searchText) {
+
         Type type = typeRepository.findByTypeName(searchText);
-        User user = userRepository.findByUsername(searchText);
+        Account account = accountRepository.findByUsername(searchText);
         Page<Board> boards = null;
-        if(Objects.isNull(type)&&Objects.isNull(user)) {
+        if(Objects.isNull(type)&&Objects.isNull(account)) {
             boards = boardRepository.findByTitleContainingOrContentContaining(searchText, searchText ,pageable);
         }else {
-            boards = boardRepository.findByBoardTypeOrUser(type,user,pageable);
+            boards = boardRepository.findByBoardTypeOrAccount(type, account,pageable);
 
         }
-    
+
         int startPage = Math.max(1, boards.getPageable().getPageNumber() - 4);
         int endPage = Math.min(boards.getTotalPages(),boards.getPageable().getPageNumber() + 4);
         List<Type> types = typeRepository.findAll();
@@ -87,6 +87,7 @@ public class BoardController {
 
     @PostMapping("/form")
     public String postform(@Valid Board board, BindingResult bindingResult, Authentication authentication) {
+
         boardValidator.validate(board, bindingResult);
         //BindingResult가 @Size와 @NotNull 등의 어노테이션이 지정한 조건에 맞지 않으면 
         //bindingResult.hasErrors에 false값을 보내준다
@@ -99,3 +100,4 @@ public class BoardController {
         return "redirect:/board/list";
     }
 }
+

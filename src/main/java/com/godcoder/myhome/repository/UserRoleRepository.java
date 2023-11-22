@@ -2,14 +2,12 @@ package com.godcoder.myhome.repository;
 
 import com.godcoder.myhome.dto.UserRoleApiDTO;
 import com.godcoder.myhome.model.UserRole;
-import lombok.var;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 
 public interface UserRoleRepository extends JpaRepository<UserRole, Long> {
 
@@ -23,6 +21,7 @@ public interface UserRoleRepository extends JpaRepository<UserRole, Long> {
     public static final String deleteUserRole =
             "DELETE FROM USER_ROLE WHERE user_id = :userId AND role_id = :roleId";
     @Transactional
+    @Modifying
     @Query(value = deleteUserRole, nativeQuery = true)
     void deleteByUserIdAndRoleId(long userId, long roleId);
 
@@ -32,4 +31,7 @@ public interface UserRoleRepository extends JpaRepository<UserRole, Long> {
 
     @Query(value = findAllUserRoles, nativeQuery = true)
     List<UserRoleApiDTO> findAllAboutUserRoles();
+
+    @Transactional
+    void deleteByUserId(long userId);
 }

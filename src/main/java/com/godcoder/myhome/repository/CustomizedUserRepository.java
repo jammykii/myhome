@@ -1,10 +1,10 @@
 package com.godcoder.myhome.repository;
 
-import com.godcoder.myhome.model.User;
+import com.godcoder.myhome.model.Account;
 
 import java.util.List;
 
 public interface CustomizedUserRepository {
-    List<User> findByUsernameCustom(String username);
-    List<User> findByUsernameJdbc(String username);
+    List<Account> findByUsernameCustom(String username);
+    List<Account> findByUsernameJdbc(String username);
 }

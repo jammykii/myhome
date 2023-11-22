@@ -13,29 +13,13 @@
       integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
       crossorigin="anonymous"
     />
-
-    <link th:href="@{/starter-template.css}" rel="stylesheet" />
-
+    <!-- <link th:href="../css/map.css" rel="stylesheet" /> -->
+    
     <title>게시판</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <header th:replace="fragments/common :: openlayer"></header>
-    <!-- <link th:href="@{/css/map.css}" rel="stylesheet" /> -->
+    
   </head>
-  <style>
-    .map {
-      height: 400px;
-      margin-bottom: 40px;
-    }
-    #subwayInfo{
-	    border: 1px solid black;
-      width: 100%;
-      max-height: 150px;
-      overflow-y: auto;
-    }
-    table, tr, td, th{
-      border: 1px solid black;
-      margin: 0 auto;
-    }
-  </style>
   <body>
     <nav
       class="navbar navbar-expand-md navbar-dark bg-dark fixed-top"
@@ -46,30 +30,37 @@
       <div id="popup">
         <div id="popup-content"></div>
       </div>  
-      <div id="info">
-        <iframe id="sigInfo" width="100%" seamless=""></iframe>
+      <div id="info" class="d-flex justify-content-between">
+        <select class="rNSelect">
+          <option value="10">10개</option>
+          <option value="30">30개</option>
+          <option value="50">50개</option>
+          <option value="100">100개</option>
+        </select>
+        <select class="radius-select">
+          <option value="500">500m</option>
+          <option value="1000">1000m</option>
+          <option value="1500">1500m</option>
+          <option value="2000">2000m</option>
+        </select>
+        <select class="cLselect">
+          <option value="병원">병원</option>
+          <option value="약국">약국</option>
+        </select>
+        <button class="btn-my-loc btn btn-primary" type="button">내 근처 병원 찾기</button>
       </div>
-      <div id="subwayInfo">
-        <table id="subwayTb">
-          <thead>
-          <tr>
-            <th>지하철호선</th>
-            <th>지하철역명</th>
-            <th>종착역</th>
-            <th>도착지방면</th>
-            <th>현재열차위치</th>
-            <th>열차상태</th>
-            <th>도착예정시간</th>
-          </tr>
+      <div id="hospinfo">
+        <table id="hospTb" class="table table-striped table-hover">
+          <thead id="hospThead">
           </thead>
-          <tbody id="subwayTbody">
-
+          <tbody id="hospTbody">
           </tbody>
         </table>
       </div>
-      <button class="btn btn-primary" type="button" onclick="markerDelete()">마커 삭제</button>
+      <button class="markDel btn btn-primary" type="button">마커 삭제</button>
     </div>
-    <script src="../js/main.js"></script>
+    <script type="module" th:src="@{/js/main.js}"></script>
+    <script type="module" th:src="@{/js/request.js}"></script>
     <footer th:replace="fragments/common :: footer"></footer>
   </body>
 </html>

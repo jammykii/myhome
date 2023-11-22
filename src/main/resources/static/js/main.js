@@ -1,47 +1,25 @@
-let content1 = document.querySelector('#info iframe');
-let content2 = document.querySelector('#subwayInfo');
+import { requestHospPhar } from "/js/request.js";
+import { vworldLayer,sigLayer,HospLayer } from "/js/layers.js";
+import { epsg3857toEpsg4326 } from "/js/changeEPSG.js";
+import { HospPoint, round } from "/js/siguHPpoint.js";
+import { markerLayer,markerList,markerDel } from "/js/addMarker.js";
+
+let rowNum = document.querySelector('#info .rNSelect')
+let cL = document.querySelector('#info .cLselect')
+let btnMyLoc = document.querySelector('#info .btn-my-loc')
+let markDel = document.querySelector('.container .markDel')
+
 let mapOverlay;
 let hover = null;
-let i = 0;
+
+let my_loc = [];
+let my_loc3857 = [];
 
 document.cookie = "safeCookie1=foo; SameSite=Lax"; 
 document.cookie = "safeCookie2=foo"; 
 document.cookie = "crossCookie=bar; SameSite=None; Secure";
 
 const sources = new ol.source.OSM();
-
-const baseLayer = new ol.layer.Tile({
-  source: new ol.source.OSM(),
-  id : "baseLayer",
-  visible : true,
-  type : 'base'
-});
-
-const vworldLayer = 
-  new ol.layer.Tile({
-    title : 'Vworld Map',
-		visible : true, 
-		type : 'base', 
-		source : new ol.source.XYZ({ 
-				url : 'http://api.vworld.kr/req/wmts/1.0.0/EB759A77-B32A-3AEE-A33A-4272DB483DFA/Base/{z}/{y}/{x}.png'
-			})
-  });   
-
-const sigLayer =  new ol.layer.Tile({
-    opacity: 0.5,
-    source: new ol.source.TileWMS({
-      url: "http://localhost:8081/geoserver/FirstProject/wms?service=WMS",
-      params: {
-        VERSION: "1.1.0",
-        LAYERS: "FirstProject:sido",
-        BBOX: [
-          742901.0625,1455705.5,1391157.0,2071492.5
-        ],
-        SRS: "EPSG:5179",
-      },
-      serverType: "geoserver",
-    }),
-  });
 
 const view = new ol.View({
   center: ol.proj.fromLonLat([129, 35.5]),
@@ -50,224 +28,25 @@ const view = new ol.View({
 });
 
 const map = new ol.Map({
-  layers: [vworldLayer, sigLayer],
+  layers: [vworldLayer],
   target: "map",
   view: view,
 });
 
-let reg = /[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/   ]/gim;
+let select = null;
 
-function doCORSRequestSubway(result){ 
-  let encoded = encodeURI(result);
-  let res2;
-  let subwayName = [];
-  let subway_nm = [];
-  let url = 'http://localhost:8081/geoserver/FirstProject/wms?SERVICE=WMS'
-  +'&VERSION=1.1.1&REQUEST=GetFeatureInfo&FORMAT=image%2Fpng&TRANSPARENT=true'
-  +'&QUERY_LAYERS=FirstProject%3Asubway_korea&STYLES&LAYERS=FirstProject%3Asubway_korea'
-  +'&exceptions=application%2Fvnd.ogc.se_inimage&INFO_FORMAT=text%2Fhtml&FEATURE_COUNT=1200&X=50&Y=50&SRS=EPSG%3A4326&WIDTH=101&HEIGHT=101&BBOX=57.65625%2C-33.75%2C199.6875%2C108.28125'
-  +`&CQL_FILTER=SBW_STATN_ADDR%20LIKE%20%27%25${result}%25%27`
-  // content2.src = url;
-  $.ajax({
-    method: 'GET',
-    url: url,
-    async: false,
-    success: function(result) {
-      let data = result.replaceAll('td', '')
-      let k = 0;   
-      res2 = data.replaceAll(reg, '').split('\n')
-      for (let i = 0; i < res2.length; i++) {
-        if(i == 49){
-          subway_nm.push(res2[i])
-        }
-        if(i > 49){
-          k++;
-          if(k % 10 == 0 && res2[i] != 'html'){           
-            subway_nm.push(res2[i])
-          }
-        }
-      }
-      res = result  
-      const set = new Set(subway_nm);
-
-      subwayName = [...set];
-    },
-  })
-  let html = '';
-  let subrs = {};
-  for (let j = 0; j < subwayName.length; j++) {
-    let stationNm = encodeURI(subwayName[j]) 
-    $.ajax({
-    method: 'GET',
-    url: 'http://127.0.0.1:8000/where/',
-    headers: {
-      'station': `${stationNm}`,
-      'direction': 'right'
-    },
-    async: false,
-    success: function(rs) {
-      subrs[`${subwayName[j]}`] = rs['subways']
-    }
-  })
-  }
-  for (const key in subrs) {
-    for (let index = 0; index < subrs[key].length; index++) {
-      html += `<tr>`
-      + `<td>${subrs[key][index]['subwayLineId']}</td>`
-      + `<td>${subrs[key][index]['stationNm']}</td>`
-      + `<td>${subrs[key][index]['finalStation']}</td>`
-      + `<td>${subrs[key][index]['lineNm']}</td>`
-      + `<td>${subrs[key][index]['lastest_station']}</td>`
-      + `<td>${subrs[key][index]['state']}</td>`
-      + `<td>${subrs[key][index]['goalTime']}</td>`
-      + `</tr>`
-    }
-  }
-  $("#subwayTbody").empty();
-  $("#subwayTbody").append(html);
-  return res;
-};
-
-function subwayPoint(result) {
-  const seoulSubway = new ol.layer.Tile({
-    name: 'subwayayer',
-    source: new ol.source.TileWMS({
-      url: "http://localhost:8081/geoserver/FirstProject/wms?service=WMS",
-      params: {
-        VERSION: "1.1.0",
-        LAYERS: "FirstProject:subway_korea",
-        BBOX: [
-          126.40961456298828,35.033748626708984,129.24710083007812,37.96311950683594,
-        ],
-        SRS: "EPSG:4326",
-        CQL_FILTER: `SBW_STATN_ADDR LIKE '%${result}%'`,
-      },
-      serverType: "geoserver",
-      }),
-  });
-
-  map.getLayers().getArray()
-  .filter(layer => layer.get('name') === 'subwayayer')
-  .forEach(layer => map.removeLayer(layer));
-  // content2.innerHTML = '';
-  map.addLayer(seoulSubway)
-  let rs = doCORSRequestSubway(result)
-  }
-
-window.addEventListener('resize', function () {
-  const minZoom = 6;
-  if (minZoom !== view.getMinZoom()) {
-    view.setMinZoom(minZoom);
-  }
-});
-
-function move() {
-  map.beforeRender(
-    ol.animation.pan({
-      source: map.getView().getCenter(),
-      duration: 1000,
-    })
-  );
-
-  map
-    .getView()
-    .setCenter(
-      new ol.geom.Point([126.95659953, 37.578220423]).getCoordinates()
-    );
-
-  map.getView().setZoom(parseInt(16));
+function selectStyle(feature) {
+  const color = feature.get('COLOR') || '#eeeeee';
+  selected.getFill().setColor(color);
+  return selected;
 }
 
-let markerSource = new ol.source.Vector();
-
-function addMarker(coordinate, name) {
-  let point_feature = new ol.Feature({
-    geometry: new ol.geom.Point([coordinate[0], coordinate[1]]),
-    name: name,
-  });
-
-  markerSource.addFeature(point_feature);
-
-  let markerStyle = new ol.style.Style({
-    image: new ol.style.Icon({
-      scale: 0.07,
-      opacity: 1,
-      anchor: [0.5, 512],
-      anchorXUnits: 'fraction',
-      anchorYUnits: 'pixels',
-      src: '../img/pin.png',
-    }),
-
-    zindex: 10,
-  });
-
-  markerLayer = new ol.layer.Vector({
-    source: markerSource,
-    style: markerStyle,
-  });
-
-  map.addLayer(markerLayer);
-}
-
-map.on("click", function (evt) {
-  let coordinate = evt.coordinate;
-  i += 1;
-
-  if(i > 1){
-    markerLayer.getSource().clear();
-  }
-  addMarker(coordinate, i);
-});
-
-function markerDelete() {
-  i = 0
-  markerLayer.getSource().clear();
-  content1.innerHTML = '';
-  content2.innerHTML = '';
-  map.getLayers().getArray()
-.filter(layer => layer.get('name') === 'subwayayer')
-.forEach(layer => map.removeLayer(layer));
-}
-
-
-
-reg = /[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/   ]/gim;
-
-map.on('singleclick', function (evt) {
-  content1.innerHTML = '';
-  
-  var viewResolution = view.getResolution();
-  let url = sigLayer.getSource().getFeatureInfoUrl(
-      evt.coordinate, viewResolution, 'EPSG:3857',
-      { 'INFO_FORMAT': 'text/html' });
-  map.getView().setCenter(evt.coordinate);
-  map.getView().setZoom(12)
-  if (url) {
-    content1.src = url
-    // console.log(url.split('&')[9])
-    function doCORSRequest(url){ 
-      var res; 
-
-      $.ajax({
-        method: 'GET',
-        url: url,
-        async: false,
-        success: function(result) {
-          let data = result.replaceAll('td', '')
-          res = data.replaceAll(reg, '').replaceAll('시', '시 ').split('\n')[49]
-        },
-      })
-      return res;
-      };
-
-      let result = doCORSRequest(url)
-      // console.log(result)
-      subwayPoint(result)
-
-  }
+const selectSingleClick = new ol.interaction.Select({
+  style: selectStyle
 });
 
 let positionFeature = new ol.Feature();
+
 positionFeature.setStyle(new ol.style.Style({
     image: new ol.style.Circle({
         radius: 6,
@@ -290,14 +69,6 @@ let geolocation = new ol.Geolocation({
 
 geolocation.setTracking(true);
 
-geolocation.on('change', function() {
-  console.log('accuracy = ' + geolocation.getAccuracy() + 'm ' +
-      'altitude = ' + geolocation.getAltitude() + 'm ' +
-      'altitudeAccuracy = ' +  geolocation.getAltitudeAccuracy() + 'm ' +
-      'heading = ' + geolocation.getHeading() + 'rad ' +
-      'speed = ' + geolocation.getSpeed() + 'm/s');
-});
-
 geolocation.on('error', function(error) {
   console.log('geolocation error: ' + error.message);
 });
@@ -305,7 +76,109 @@ geolocation.on('error', function(error) {
 geolocation.on('change:position', function() {
   var coordinates = geolocation.getPosition();
   positionFeature.setGeometry(coordinates ? new ol.geom.Point(coordinates) : null);
+  my_loc = epsg3857toEpsg4326(coordinates);
+  my_loc3857 = coordinates;
 });
+
+btnMyLoc.addEventListener("click", ()=>{
+  if(document.querySelector('.ol-popup') != null){
+    document.querySelector('.ol-popup').remove()
+  }
+  if(document.querySelector('.mk-popup') != null){
+    document.querySelector('.mk-popup').remove()
+  }
+  map.getLayers().getArray()
+  .filter(layer => layer.get('id') === 'sigLayerCQL'|| layer.get('id') === 'HospMyLoc')
+  .forEach(layer => map.removeLayer(layer));
+  const HospMyLoc =  new ol.layer.Tile({
+    id: 'HospMyLoc',
+    opacity: 0.5,
+    source: new ol.source.TileWMS({
+      url: "http://localhost:8081/geoserver/FirstProject/wms?service=WMS",
+      params: {
+        VERSION: "1.1.0",
+        LAYERS: "FirstProject:hosp",
+        BBOX: [
+          125.171875,33.22053909301758,129.5814971923828,38.47322463989258
+        ],
+        SRS: "EPSG:4326",
+        CQL_FILTER: `BBOX(geom,${round[0]},${round[1]},${round[2]},${round[3]})`,
+      },
+      serverType: "geoserver",
+    }),
+  });
+  map.addLayer(HospMyLoc)
+  // console.log(HospMyLoc.getSource().getParams())
+  // console.log(HospMyLoc.getSource().getParams())
+  map.getView().setCenter(my_loc3857);
+  map.getView().setZoom(13);
+});
+
+// map.on('click', async function(evt) {
+//   map.getTargetElement().style.cursor = map.hasFeatureAtPixel(evt.pixel) ? 'pointer' : '';
+//   if (hov !== null) {
+//     hov = null;
+//     pop.innerHTML = '';
+//     pop.style.display = 'none';
+//     pop.style.width = '0';
+//     pop.style.height = '0'
+//   }  
+//   map.forEachFeatureAtPixel(evt.pixel, function(f) {
+//     hov = f;
+//     return true;
+//   });
+//   if(hov){
+//     if(document.getElementsByClassName('mk-popup')[0] != null){
+//       document.getElementsByClassName('mk-popup')[0].remove();
+//     }
+//     let coord = hov.values_.geometry.flatCoordinates;
+//     pop = document.createElement("div");
+//     pop.classList.add('mk-popup');
+//     pop.innerHTML = '';
+//     pop.innerHTML += '<p>병원명<span class="close_btn">X</span></p>'
+//     let idx = 0;
+//     let cnt = 0;
+//     markerList.forEach(item=>{
+//       var geoJSONFormat = new ol.format.GeoJSON();
+//       var fe = geoJSONFormat.readFeature(markerList)
+//       if(hov.ol_uid == Object.keys(item.getSource().uidIndex_)[idx] || 
+//       hov.values_.geometry.flatCoordinates[0] == item.getSource().uidIndex_[`${Object.keys(item.getSource().uidIndex_)[idx]}`].values_.geometry.flatCoordinates[0]){
+//         pop.innerHTML += `${item.get('name')}<br>`;
+//         cnt ++;
+//       }
+//       idx += 1;
+//     })
+//     console.log(cnt)
+//     pop.style.display = 'block';
+//     pop.style.width = '400px';
+//     pop.style.height = '300px';
+    
+//     let overlay = new ol.Overlay({
+//       element: pop,
+//       autoPan: true,
+//       className: "multiPopup",
+//       autoPanMargin: 100,
+//       autoPanAnimation: {
+//         duration: 400
+//       }
+//     });
+
+//   overlay.setPosition(coord);
+//   map.addOverlay(overlay);
+
+//   let oElem = overlay.getElement();
+//     oElem.addEventListener('click', function(e) {
+//       var target = e.target;
+//       if (target.className == "close_btn") {
+//         map.removeOverlay(overlay);
+//       }
+//     });
+//   }
+// });
+
+markDel.addEventListener('click',()=>{
+  markerDel()
+})
 
 new ol.layer.Vector({
   map: map,
@@ -313,3 +186,5 @@ new ol.layer.Vector({
       features: [positionFeature]
   })
 });
+
+export { map, markerLayer, view, my_loc3857 }

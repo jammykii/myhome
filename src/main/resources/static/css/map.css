@@ -1,3 +1,80 @@
+
+body {
+  padding-top: 5rem;
+}
+
+.starter-template {
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+
+.heart{
+  width: 50px;
+  height: 50px;
+}
+
+.tableWrap {
+  max-height: 500px;
+  overflow-y: scroll;
+  margin: 40px 0;
+}
+
 .map {
-    height: 400px;
-  }
+  height: 400px;
+  margin-bottom: 40px;
+}
+
+#subwayInfo{
+  /* border: 1px solid black; */
+  width: 100%;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+table, tr, td, th{
+  /* border: 1px solid black; */
+  margin: 0 auto;
+}
+
+.ol-popup{
+  background: rgba(180, 180, 180, 0.5);
+  border-radius: 10px;
+  color: white;
+}
+
+#hospinfo {
+  max-height: 315px;
+  overflow-y: scroll;
+  margin: 20px 0;
+}
+
+#hospinfo::-webkit-scrollbar {
+  width: 8px;  
+}
+
+#hospinfo::-webkit-scrollbar-thumb {
+  height: 30%; 
+  background: #919191; 
+  border-radius: 10px;
+}
+
+#hospinfo::-webkit-scrollbar-track {
+  background: rgba(33, 122, 244, .1); 
+}
+
+.mk-popup{
+  background: white;
+  border-radius: 10px;
+  color: black;
+}
+
+.mk-popup>p{
+  text-align: center;
+  color: black;
+  margin: 0;
+  padding: 10px;
+}
+
+.mk-popup > p > span{
+  float: right;
+}

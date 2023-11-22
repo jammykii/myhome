@@ -7,3 +7,17 @@ import java.util.List;
 public interface CustomizedBoardRepository {
     List<Board> findByUsernameJdbc(String username);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

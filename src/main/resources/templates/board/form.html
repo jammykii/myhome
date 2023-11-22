@@ -9,12 +9,14 @@
     <link th:href="@{/starter-template.css}" rel="stylesheet">
 
     <title>게시판</title>
+    <style>
+
+    </style>
 </head>
 
 <body>
 <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top" th:replace="fragments/common :: menu('board')">
 </nav>
-
     <div class="container">
         <h1>게시판</h1>
         <form action="#" th:action="@{/board/form}" th:object="${board}" method="post">
@@ -44,29 +46,21 @@
                     제목 에러 메세지
                 </div>
             </div>
+            <div class="mb-3">
+                <img src="../img/heart_empty.png" class="heart">
               <div class="text-right">
                 <a class="btn btn-primary" th:href="@{/board/list}">취소</a>
                 <button type="button" class="btn btn-primary" 
                 sec:authorize="hasRole('ROLE_ADMIN')" th:onclick="|deleteBoard(*{id})|">삭제</button>
                 <button type="submit" class="btn btn-primary">확인</button>
+            </div>
               </div>
         </form>
     </div>
-
+    <script src="../js/form.js"></script>
     <footer th:replace="fragments/common :: footer"></footer>
     <script>
-        function deleteBoard(id) {
-            //DELETE /api/boards/{id}
-            $.ajax({
-                url: '/api/boards/' + id,
-                type: 'DELETE',
-                success: function(result) {
-                    console.log('result', result);
-                    alert('삭제됐습니다.');     
-                    window.location.href = '/board/list';
-                }
-            });
-        }
+       
     </script>
 </body>
 

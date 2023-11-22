@@ -1,7 +1,6 @@
 package com.godcoder.myhome.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import com.godcoder.myhome.dto.BoardCountRankDTO;
 import com.godcoder.myhome.model.Board;
@@ -18,8 +17,6 @@ class BoardApiController {
     @Autowired
     private BoardRepository repository;
 
-    // Aggregate root
-    // tag::get-aggregate-root[]
     @GetMapping("/boards")
     List<Board> all(@RequestParam(required = false, defaultValue = "") String title,
     @RequestParam(required = false, defaultValue = "") String content) {
