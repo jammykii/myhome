@@ -1,5 +1,5 @@
 
-import { map, markerLayer, view, my_loc3857 } from "/js/main.js";
+import { map, markerLayer, view, my_loc3857,LayerReset } from "/js/main.js";
 import { requestHospPhar } from "/js/request.js";
 import { epsg3857toEpsg4326 } from "/js/changeEPSG.js";
 import { vworldLayer,sigLayer,HospLayer } from "/js/layers.js";
@@ -43,7 +43,6 @@ window.onload = function(){
         ctx.arc(x, y, radius, 0, 2 * Math.PI, true);
         ctx.strokeStyle = 'rgba(95,198,240,1)';
         ctx.stroke();
-        console.log(radius)
       },
     })
   )
@@ -58,7 +57,6 @@ window.onload = function(){
   const circle = new ol.geom.Circle(my_loc3857, 2500)
 
   round = epsg3857toEpsg4326(circle.getExtent())
-  console.log(round)
 
   map.on('singleclick', function (evt) {
   var viewResolution = view.getResolution();
@@ -76,6 +74,8 @@ window.onload = function(){
         success: function(result) {
           var geoJSONFormat = new ol.format.GeoJSON();
           let data = geoJSONFormat.readFeatures(result)[0].getProperties()['sig_kor_nm']
+          let properties = geoJSONFormat.readFeatures(result)[0].getProperties()
+          console.log(properties)
           res = data
           res_api = data.replace(/시|광역|특별|자치/g, '').replace(' ','')
         },
@@ -126,9 +126,7 @@ function HospPoint(result, res) {
       })
     })
   });
-  map.getLayers().getArray()
-  .filter(layer =>layer.get('id') === 'sigLayerCQL'|| layer.get('id') === 'HospMyLoc')
-  .forEach(layer => map.removeLayer(layer));
+  LayerReset()
   map.addLayer(sigLayerCQL)
   var vectorSource = new ol.source.Vector({
     loader: function(extent, resolution, projection) {
@@ -142,6 +140,7 @@ function HospPoint(result, res) {
         success: function(data){
           var geoJSONFormat = new ol.format.GeoJSON();
           var feature = geoJSONFormat.readFeatures(data);
+          console.log(data)
           vectorSource.addFeatures(feature);
           if(feature.length!=0){
             var extent = ol.extent.createEmpty();
@@ -162,11 +161,7 @@ function HospPoint(result, res) {
   if( markerLayer != undefined ){
     markerLayer.getSource().clear();
   }
-  // if(result[result.length-1] == '시'){
-    let rs = requestHospPhar(result, 'A')
-  // }else{
-    // let rs = requestHospPhar(res, 'A')
-  // }
+  let rs = requestHospPhar(result, 'A')
 }
   
 window.addEventListener('resize', function () {

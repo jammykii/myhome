@@ -4,10 +4,11 @@ import { epsg3857toEpsg4326 } from "/js/changeEPSG.js";
 import { HospPoint, round } from "/js/siguHPpoint.js";
 import { markerLayer,markerList,markerDel } from "/js/addMarker.js";
 
-let rowNum = document.querySelector('#info .rNSelect')
-let cL = document.querySelector('#info .cLselect')
-let btnMyLoc = document.querySelector('#info .btn-my-loc')
-let markDel = document.querySelector('.container .markDel')
+// let rowNum = document.querySelector('#info .rNSelect')
+// let cL = document.querySelector('#info .cLselect')
+let btnMyLoc = document.querySelector('.btn-my-loc')
+let markDel = document.querySelector('.markDel')
+let hospLocbtn = document.querySelectorAll('.hospLoc')
 
 let mapOverlay;
 let hover = null;
@@ -22,8 +23,8 @@ document.cookie = "crossCookie=bar; SameSite=None; Secure";
 const sources = new ol.source.OSM();
 
 const view = new ol.View({
-  center: ol.proj.fromLonLat([129, 35.5]),
-  zoom: 6,
+  center: ol.proj.fromLonLat([126.986, 37.541]),
+  zoom: 10,
   minZoom: 6,
 });
 
@@ -80,6 +81,51 @@ geolocation.on('change:position', function() {
   my_loc3857 = coordinates;
 });
 
+function LayerReset(){
+  map.getLayers().getArray()
+  .filter(layer =>layer.get('id') === 'sigLayerCQL'|| layer.get('id') === 'HospLocLayer'|| layer.get('id') === 'HospMyLoc')
+  .forEach(layer => map.removeLayer(layer));
+}
+
+
+for(let i of hospLocbtn){
+  i.addEventListener('click', ()=>{
+      var hospykiho = i.getAttribute("ykiho");
+      console.log(hospykiho)
+      getHospLoc(hospykiho)
+  })
+}
+
+function getHospLoc(ykiho) {
+  LayerReset()
+  var cqlFilter;
+  if(ykiho!=null){
+    cqlFilter = "ykiho = '"+ykiho+"'";
+  }
+  console.log(cqlFilter)
+  const HospLocLayer =  new ol.layer.Tile({
+    id: 'HospLocLayer',
+    opacity: 0.5,
+    source: new ol.source.TileWMS({
+      url: "http://localhost:8081/geoserver/FirstProject/wms?service=WMS",
+      params: {
+        VERSION: "1.1.0",
+        LAYERS: "FirstProject:hospital",
+        BBOX: [
+          125.171875,33.22053909301758,129.5814971923828,38.47322463989258
+        ],
+        SRS: "EPSG:4326",
+        CQL_FILTER: `${cqlFilter}`,
+      },
+      serverType: "geoserver",
+    }),
+  });
+  map.addLayer(HospLocLayer)
+  console.log(HospLocLayer.getSource().getExtent())
+  // map.getView().setCenter(HospLocLayer.getSource().tmpExtent_);
+  map.getView().setZoom(16);
+}
+
 btnMyLoc.addEventListener("click", ()=>{
   if(document.querySelector('.ol-popup') != null){
     document.querySelector('.ol-popup').remove()
@@ -87,9 +133,7 @@ btnMyLoc.addEventListener("click", ()=>{
   if(document.querySelector('.mk-popup') != null){
     document.querySelector('.mk-popup').remove()
   }
-  map.getLayers().getArray()
-  .filter(layer => layer.get('id') === 'sigLayerCQL'|| layer.get('id') === 'HospMyLoc')
-  .forEach(layer => map.removeLayer(layer));
+  LayerReset()
   const HospMyLoc =  new ol.layer.Tile({
     id: 'HospMyLoc',
     opacity: 0.5,
@@ -108,8 +152,6 @@ btnMyLoc.addEventListener("click", ()=>{
     }),
   });
   map.addLayer(HospMyLoc)
-  // console.log(HospMyLoc.getSource().getParams())
-  // console.log(HospMyLoc.getSource().getParams())
   map.getView().setCenter(my_loc3857);
   map.getView().setZoom(13);
 });
@@ -183,8 +225,13 @@ markDel.addEventListener('click',()=>{
 new ol.layer.Vector({
   map: map,
   source: new ol.source.Vector({
-      features: [positionFeature]
+    features: [positionFeature]
   })
 });
 
-export { map, markerLayer, view, my_loc3857 }
+
+
+
+
+
+export { map, markerLayer, view, my_loc3857, LayerReset}

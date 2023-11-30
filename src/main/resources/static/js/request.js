@@ -1,24 +1,5 @@
 import { map, markerLayer, view } from "/js/main.js";
 
-let rowNum = document.querySelector('#info .rNSelect')
-let cL = document.querySelector('#info .cLselect')
-let radiusSelect = document.querySelector('#info .radius-select')
-
-let rowN = 10;
-rowNum.addEventListener("change", ()=>{
-  rowN = rowNum.value;
-});
-
-let clcd = '병원';
-cL.addEventListener("change", ()=>{
-  clcd = cL.value;
-});
-
-let radius = 500;
-radiusSelect.addEventListener("change", ()=>{
-  radius = radiusSelect.value;
-});
-
 function requestHospPhar(result, type){ 
     let html = '';
     let thead = '';
@@ -45,6 +26,8 @@ function requestHospPhar(result, type){
         }),
       });
       map.addLayer(sigHosp)
+      var geoJSONFormat = new ol.format.GeoJSON();
+      console.log(sigHosp.getProperties())
     }else{
       
     }
