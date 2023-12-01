@@ -75,7 +75,6 @@ window.onload = function(){
           var geoJSONFormat = new ol.format.GeoJSON();
           let data = geoJSONFormat.readFeatures(result)[0].getProperties()['sig_kor_nm']
           let properties = geoJSONFormat.readFeatures(result)[0].getProperties()
-          console.log(properties)
           res = data
           res_api = data.replace(/시|광역|특별|자치/g, '').replace(' ','')
         },
@@ -156,8 +155,7 @@ function HospPoint(result, res) {
 	      layer.setSource(vectorSource);
 	  }
 	});
-    
-  
+
   if( markerLayer != undefined ){
     markerLayer.getSource().clear();
   }

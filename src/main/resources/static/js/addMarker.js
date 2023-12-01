@@ -20,7 +20,6 @@ function markerDel(){
   if(document.querySelector('.mk-popup') != null){
     document.querySelector('.mk-popup').remove()
   }
-  $("#hospTbody").empty();
   LayerReset()
 }
 

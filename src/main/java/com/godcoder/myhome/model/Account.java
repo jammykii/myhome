@@ -32,4 +32,7 @@ public class Account {
     @JsonIgnore
     private List<Board> boards = new ArrayList<>();
 
+//    @OneToMany(cascade = CascadeType.ALL,mappedBy = "Heart", fetch = FetchType.LAZY)
+//    private Heart heart;
+
 }

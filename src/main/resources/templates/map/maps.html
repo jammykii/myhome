@@ -32,7 +32,11 @@
         <form th:action="@{/map/maps}" method="get" class="search">
           <select name="clNm" class="clCd">
             <option th:value="all">선택</option>
-            <option th:each="clNm : ${clNm}" th:value="${clNm}" th:text="${clNm}">선택</option>
+            <option th:each="clNm : ${clNm}" th:value="${clNm}" th:text="${clNm}" th:selected="${clNm}==${param.clNm}">선택</option>
+          </select>
+          <select name="sido" class="clCd">
+            <option th:value="all">선택</option>
+            <option th:each="sido : ${sido}" th:value="${sido}" th:text="${sido}" th:selected="${sido}==${param.sido}">선택</option>
           </select>
           <input type="text" name="values" class="searchBox">
           <input type="submit" class="searchBtn" value="검색"></input>
@@ -66,13 +70,13 @@
         <nav aria-label="Page navigation example">
           <ul class="pagination justify-content-center">
             <li class="page-item" th:classappend="${1 == hosp.pageable.pageNumber + 1} ? 'disabled'">
-              <a class="page-link" href="#" th:href="@{/map/maps(page=${hosp.pageable.pageNumber - 1},values=${param.values},clNm=${param.clNm})}">Previous</a>
+              <a class="page-link" href="#" th:href="@{/map/maps(page=${hosp.pageable.pageNumber - 1},values=${param.values},clNm=${param.clNm},sido=${param.sido})}">Previous</a>
             </li>
             <li class="page-item" th:classappend="${i == hosp.pageable.pageNumber + 1} ? 'disabled'" 
             th:each="i: ${#numbers.sequence(startPage, endPage)}">
-              <a class="page-link" href="#" th:text="${i}" th:href="@{/map/maps(page=${i - 1},values=${param.values},clNm=${param.clNm})}">1</a></li>
+              <a class="page-link" href="#" th:text="${i}" th:href="@{/map/maps(page=${i - 1},values=${param.values},clNm=${param.clNm},sido=${param.sido})}">1</a></li>
             <li class="page-item" th:classappend="${hosp.totalPages == hosp.pageable.pageNumber + 1} ? 'disabled'">
-              <a class="page-link" href="#" th:href="@{/map/maps(page=${hosp.pageable.pageNumber + 1},values=${param.values},clNm=${param.clNm})}">Next</a>
+              <a class="page-link" href="#" th:href="@{/map/maps(page=${hosp.pageable.pageNumber + 1},values=${param.values},clNm=${param.clNm},sido=${param.sido})}">Next</a>
             </li>
           </ul>
         </nav>
@@ -87,6 +91,5 @@
     <script type="module" th:src="@{/js/request.js}"></script>
     <footer th:replace="fragments/common :: footer"></footer>
   </div>
-  <script src="../js/Map.js"></script>
   </body>
 </html>

@@ -62,7 +62,6 @@ class UserApiController {
 
     @GetMapping("/username/{username}/exists")
     public ResponseEntity<Boolean> checkUserName(@PathVariable String username){
-        log.debug("1");
         System.out.println(ResponseEntity.ok(accountService.checkUserNameDuplicate(username)));
         return ResponseEntity.ok(accountService.checkUserNameDuplicate(username));
     }

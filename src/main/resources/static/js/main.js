@@ -82,8 +82,14 @@ geolocation.on('change:position', function() {
 });
 
 function LayerReset(){
+  if(document.querySelector('.ol-popup') != null){
+    document.querySelector('.ol-popup').remove()
+  }
+  if(document.querySelector('.mk-popup') != null){
+    document.querySelector('.mk-popup').remove()
+  }
   map.getLayers().getArray()
-  .filter(layer =>layer.get('id') === 'sigLayerCQL'|| layer.get('id') === 'HospLocLayer'|| layer.get('id') === 'HospMyLoc')
+  .filter(layer =>layer.get('id') === 'sigLayerCQL'|| layer.get('id') === 'HospLoc'|| layer.get('id') === 'HospMyLoc')
   .forEach(layer => map.removeLayer(layer));
 }
 
@@ -103,36 +109,49 @@ function getHospLoc(ykiho) {
     cqlFilter = "ykiho = '"+ykiho+"'";
   }
   console.log(cqlFilter)
-  const HospLocLayer =  new ol.layer.Tile({
-    id: 'HospLocLayer',
-    opacity: 0.5,
-    source: new ol.source.TileWMS({
-      url: "http://localhost:8081/geoserver/FirstProject/wms?service=WMS",
-      params: {
-        VERSION: "1.1.0",
-        LAYERS: "FirstProject:hospital",
-        BBOX: [
-          125.171875,33.22053909301758,129.5814971923828,38.47322463989258
-        ],
-        SRS: "EPSG:4326",
-        CQL_FILTER: `${cqlFilter}`,
-      },
-      serverType: "geoserver",
-    }),
+  const HospLoc =  new ol.layer.Vector({
+    source: vectorSource,
+    id : "HospLoc",
+    style: new ol.style.Style({
+      image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+        color: '#8959A8',
+        crossOrigin: 'anonymous',
+        src: 'https://openlayers.org/en/v8.2.0/examples/data/dot.png'
+      }))
+    })
   });
-  map.addLayer(HospLocLayer)
-  console.log(HospLocLayer.getSource().getExtent())
-  // map.getView().setCenter(HospLocLayer.getSource().tmpExtent_);
-  map.getView().setZoom(16);
+  map.addLayer(HospLoc)
+  var vectorSource = new ol.source.Vector({
+    loader: function(extent, resolution, projection) {
+  let vec_url = 'http://localhost:8081/geoserver/FirstProject/wfs?'
+      + 'service=WFS&version=1.1.0&request=GetFeature&'
+      + 'typename=FirstProject:hospital&outputFormat=application/json&'
+      + 'srsname=EPSG:3857&'
+      + `cql_filter=${cqlFilter}`
+      $.ajax({
+        url: vec_url,
+        success: function(data){
+          var geoJSONFormat = new ol.format.GeoJSON();
+          var feature = geoJSONFormat.readFeatures(data);
+          vectorSource.addFeatures(feature);
+          if(feature.length!=0){
+            var extent = ol.extent.createEmpty();
+            ol.extent.extend(extent, vectorSource.getExtent());
+            map.getView().setCenter(extent);
+            map.getView().setZoom(18);
+          }
+        }
+      })
+    }
+  });
+  map.getLayers().forEach(function(layer){
+	  if(layer.get("id")=="HospLoc"){
+	    layer.setSource(vectorSource);
+	  }
+	});
 }
 
 btnMyLoc.addEventListener("click", ()=>{
-  if(document.querySelector('.ol-popup') != null){
-    document.querySelector('.ol-popup').remove()
-  }
-  if(document.querySelector('.mk-popup') != null){
-    document.querySelector('.mk-popup').remove()
-  }
   LayerReset()
   const HospMyLoc =  new ol.layer.Tile({
     id: 'HospMyLoc',
@@ -204,10 +223,8 @@ btnMyLoc.addEventListener("click", ()=>{
 //         duration: 400
 //       }
 //     });
-
 //   overlay.setPosition(coord);
 //   map.addOverlay(overlay);
-
 //   let oElem = overlay.getElement();
 //     oElem.addEventListener('click', function(e) {
 //       var target = e.target;
@@ -228,10 +245,5 @@ new ol.layer.Vector({
     features: [positionFeature]
   })
 });
-
-
-
-
-
 
 export { map, markerLayer, view, my_loc3857, LayerReset}

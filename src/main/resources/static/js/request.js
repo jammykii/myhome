@@ -27,7 +27,6 @@ function requestHospPhar(result, type){
       });
       map.addLayer(sigHosp)
       var geoJSONFormat = new ol.format.GeoJSON();
-      console.log(sigHosp.getProperties())
     }else{
       
     }
